@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Emgu.CV;
-//using OpenCvSharp;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 namespace TestOpenCV
@@ -34,7 +33,6 @@ namespace TestOpenCV
             var img2 = new Image<Gray, byte>(img.ToBitmap());
 
             //把图片从彩色转灰度
-           // CvInvoke.cvCheckArr(img, img2, ColorConversion.Bgr2Gray);
             CvInvoke.CvtColor(img, img2, ColorConversion.Bgr2Gray);
 
             //亮度增强
