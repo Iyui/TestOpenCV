@@ -126,6 +126,7 @@
             this.btn_ToGray.TabIndex = 3;
             this.btn_ToGray.Text = "批量灰度化";
             this.btn_ToGray.UseVisualStyleBackColor = true;
+            this.btn_ToGray.Visible = false;
             this.btn_ToGray.Click += new System.EventHandler(this.btn_ToGray_Click);
             // 
             // Form1
