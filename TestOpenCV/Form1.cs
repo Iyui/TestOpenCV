@@ -21,6 +21,8 @@ namespace TestOpenCV
         }
         Image<Bgr, byte> img;
         Image<Gray, byte> Grayimg;
+        PictureBox[] pict;
+      
         private void Test(Image<Bgr, byte> img, Image<Gray, byte> Grayimg, bool save=false)
         {
 
@@ -48,7 +50,8 @@ namespace TestOpenCV
             //循环把人脸部分切出来并保存
            // CutandSave(facesDetected);
             ShowCut(facesDetected);
-
+            CutandSave(facesDetected);
+            MessageBox.Show($"{facesDetected.Count()}个");
 
             //释放资源退出
             img.Dispose();
@@ -62,6 +65,7 @@ namespace TestOpenCV
         {
             int count = 0;
             var b = img.ToBitmap();
+            pict = new PictureBox[facesDetected.Count()];
             foreach (var item in facesDetected)
             {
                 count++;
@@ -69,8 +73,9 @@ namespace TestOpenCV
                 var g = Graphics.FromImage(bmpOut);
                 g.DrawImage(b, new Rectangle(0, 0, item.Width, item.Height), new Rectangle(item.X, item.Y, item.Width, item.Height), GraphicsUnit.Pixel);
                 g.Dispose();
-                bmpOut.Save($"{count}.png", System.Drawing.Imaging.ImageFormat.Png);
-                bmpOut.Dispose();
+                generatorPictureBox(count, bmpOut);
+                //bmpOut.Save($"{count}.png", System.Drawing.Imaging.ImageFormat.Png);
+               // bmpOut.Dispose();
             }
             b.Dispose();
         }
@@ -129,9 +134,132 @@ namespace TestOpenCV
             return image;
         }
 
+        public void generatorPictureBox(int count,Image bmpOut)
+        {
+
+            pict[count - 1] = new System.Windows.Forms.PictureBox
+            {
+                SizeMode = PictureBoxSizeMode.Zoom,
+                Size = new Size(50, 50),//设置图片大小
+                BorderStyle = BorderStyle.None,//取消边框
+                Image = bmpOut,
+                Location = new Point(10 + (count - 1) * 60, 5)//设置图片位置  竖向排列
+            };
+            splitContainer2.Panel2.Controls.Add(pict[count - 1]); //添加picturebox
+
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             Test(img,Grayimg);
+        }
+
+        public class GrayImage
+        {
+
+            Image<Bgr, byte> _img;
+            Image<Gray, byte> Grayimg;
+
+            public GrayImage ()
+            {
+                _imgs = GrayImgs;
+                _img = BgrImg;
+            }
+
+            public List<Image<Gray, byte>> GrayImgs
+            {
+                set;get;
+            }
+            public Image<Bgr, byte> BgrImg
+            {
+                set; get;
+            }
+            List<Image<Gray, byte>> Grayimgs = new List<Image<Gray, byte>>();
+            private List<Image<Gray, byte>> _imgs;
+
+
+            public Dictionary<string, Image<Bgr, byte>> BgrImageDic = new Dictionary<string, Image<Bgr, byte>>();
+
+            public Dictionary<string, Image<Gray, byte>> GrayImageDic = new Dictionary<string, Image<Gray, byte>>();
+            /// <summary>
+            /// 灰度化
+            /// </summary>
+            /// <returns></returns>
+            public Bitmap Gray()
+            {
+                //把图片从彩色转灰度
+                CvInvoke.CvtColor(_img, Grayimg, ColorConversion.Bgr2Gray);
+                return Grayimg.Bitmap;
+            }
+
+            /// <summary>
+            /// 批量灰度化
+            /// </summary>
+            public Dictionary<string, Image<Gray, byte>> ImagesToGray()
+            {
+                foreach(var key in BgrImageDic.Keys)
+                {
+                    GrayImageDic.Add(key,Gray(BgrImageDic[key]));
+                }
+                return GrayImageDic;
+            }
+
+            /// <summary>
+            /// 批量灰度化
+            /// </summary>
+            /// <returns></returns>
+            public Image<Gray, byte> Gray(Image<Bgr, byte> img)
+            {
+                Grayimg = new Image<Gray, byte>(img.ToBitmap());
+                //把图片从彩色转灰度
+                CvInvoke.CvtColor(img, Grayimg, ColorConversion.Bgr2Gray);
+                return Grayimg;
+            }
+        }
+
+        private void btn_ToGray_Click(object sender, EventArgs e)
+        {
+            GrayImage gi = new GrayImage();
+            Dictionary<string, Image<Bgr, byte>> BgrImageDic = new Dictionary<string, Image<Bgr, byte>>();
+            string path = FolderPath();
+            var files = Directory.GetFiles(path, "*.jpg");
+            for (int i = 0; i < files.Count(); i++)
+            {
+                var imgpath = files[i];
+                img = new Image<Bgr, byte>(imgpath);
+                BgrImageDic.Add(imgpath,img);
+            }
+            gi.BgrImageDic = BgrImageDic;
+            var grayimgs = gi.ImagesToGray();
+            foreach (var key in grayimgs.Keys)
+            {
+                grayimgs[key].Save(key);
+            }
+            MessageBox.Show("转化完成");
+        }
+
+        /// <summary>
+        /// 获取文件夹路径
+        /// </summary>
+        /// <param name="hint"></param>
+        /// <returns></returns>
+        private string FolderPath()
+        {
+            string Path = "";
+            FolderBrowserDialog dialog = new FolderBrowserDialog
+            {
+             //  Description = hint
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                if (string.IsNullOrEmpty(dialog.SelectedPath))
+                {
+                    MessageBox.Show(this, "文件夹路径不能为空", "提示");
+                    return "";
+                }
+                Path = dialog.SelectedPath;
+            }
+            return Path;
         }
     }
 }
