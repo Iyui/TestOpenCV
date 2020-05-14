@@ -156,85 +156,39 @@ namespace TestOpenCV
 
         public class GrayImage
         {
-
-            Image<Bgr, byte> _img;
-            Image<Gray, byte> Grayimg;
-
             public GrayImage ()
             {
-                _imgs = GrayImgs;
-                _img = BgrImg;
             }
-
-            public List<Image<Gray, byte>> GrayImgs
-            {
-                set;get;
-            }
-            public Image<Bgr, byte> BgrImg
-            {
-                set; get;
-            }
-            List<Image<Gray, byte>> Grayimgs = new List<Image<Gray, byte>>();
-            private List<Image<Gray, byte>> _imgs;
-
-
-            public Dictionary<string, Image<Bgr, byte>> BgrImageDic = new Dictionary<string, Image<Bgr, byte>>();
-
-            public Dictionary<string, Image<Gray, byte>> GrayImageDic = new Dictionary<string, Image<Gray, byte>>();
-            /// <summary>
-            /// 灰度化
-            /// </summary>
-            /// <returns></returns>
-            public Bitmap Gray()
-            {
-                //把图片从彩色转灰度
-                CvInvoke.CvtColor(_img, Grayimg, ColorConversion.Bgr2Gray);
-                return Grayimg.Bitmap;
-            }
-
             /// <summary>
             /// 批量灰度化
             /// </summary>
-            public Dictionary<string, Image<Gray, byte>> ImagesToGray()
+            public void ImagesToGray(List<string> path)
             {
-                foreach(var key in BgrImageDic.Keys)
+                for (int i = 0; i < path.Count; i++)
                 {
-                    GrayImageDic.Add(key,Gray(BgrImageDic[key]));
+                    var img = new Image<Bgr, byte>(path[i]);
+                    var Grayimg = new Image<Gray, byte>(img.ToBitmap());
+                    CvInvoke.CvtColor(img, Grayimg, ColorConversion.Bgr2Gray);
+                    Grayimg.Save(path[i]);
+                    Grayimg.Dispose();
                 }
-                return GrayImageDic;
-            }
-
-            /// <summary>
-            /// 批量灰度化
-            /// </summary>
-            /// <returns></returns>
-            public Image<Gray, byte> Gray(Image<Bgr, byte> img)
-            {
-                Grayimg = new Image<Gray, byte>(img.ToBitmap());
-                //把图片从彩色转灰度
-                CvInvoke.CvtColor(img, Grayimg, ColorConversion.Bgr2Gray);
-                return Grayimg;
             }
         }
 
         private void btn_ToGray_Click(object sender, EventArgs e)
         {
             GrayImage gi = new GrayImage();
-            Dictionary<string, Image<Bgr, byte>> BgrImageDic = new Dictionary<string, Image<Bgr, byte>>();
+            ///Dictionary<string, Image<Bgr, byte>> BgrImageDic = new Dictionary<string, Image<Bgr, byte>>();
+            List<string> imgpaths = new List<string>();
             string path = FolderPath();
             var files = Directory.GetFiles(path, "*.jpg");
             for (int i = 0; i < files.Count(); i++)
             {
                 var imgpath = files[i];
-                img = new Image<Bgr, byte>(imgpath);
-                BgrImageDic.Add(imgpath,img);
+                //img = new Image<Bgr, byte>(imgpath);
+                imgpaths.Add(imgpath);
             }
-            gi.BgrImageDic = BgrImageDic;
-            var grayimgs = gi.ImagesToGray();
-            foreach (var key in grayimgs.Keys)
-            {
-                grayimgs[key].Save(key);
-            }
+            gi.ImagesToGray(imgpaths);
             MessageBox.Show("转化完成");
         }
 

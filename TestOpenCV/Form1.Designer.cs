@@ -31,10 +31,10 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.btn_ToGray = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.btn_ToGray = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -89,6 +89,16 @@
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
+            // btn_ToGray
+            // 
+            this.btn_ToGray.Location = new System.Drawing.Point(14, 287);
+            this.btn_ToGray.Name = "btn_ToGray";
+            this.btn_ToGray.Size = new System.Drawing.Size(75, 23);
+            this.btn_ToGray.TabIndex = 3;
+            this.btn_ToGray.Text = "批量灰度化";
+            this.btn_ToGray.UseVisualStyleBackColor = true;
+            this.btn_ToGray.Click += new System.EventHandler(this.btn_ToGray_Click);
+            // 
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(120, 197);
@@ -117,17 +127,6 @@
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox2.TabIndex = 0;
             this.pictureBox2.TabStop = false;
-            // 
-            // btn_ToGray
-            // 
-            this.btn_ToGray.Location = new System.Drawing.Point(14, 287);
-            this.btn_ToGray.Name = "btn_ToGray";
-            this.btn_ToGray.Size = new System.Drawing.Size(75, 23);
-            this.btn_ToGray.TabIndex = 3;
-            this.btn_ToGray.Text = "批量灰度化";
-            this.btn_ToGray.UseVisualStyleBackColor = true;
-            this.btn_ToGray.Visible = false;
-            this.btn_ToGray.Click += new System.EventHandler(this.btn_ToGray_Click);
             // 
             // Form1
             // 
