@@ -22,8 +22,8 @@ namespace TestOpenCV
         Image<Bgr, byte> img;
         Image<Gray, byte> Grayimg;
         PictureBox[] pict;
-      
-        private void Test(Image<Bgr, byte> img, Image<Gray, byte> Grayimg, bool save=false)
+
+        private void Test(Image<Bgr, byte> img, Image<Gray, byte> Grayimg, bool save = false)
         {
 
             //如果支持用显卡,则用显卡运算
@@ -31,8 +31,9 @@ namespace TestOpenCV
 
             //构建级联分类器,利用已经训练好的数据,识别人脸
             //var face = new CascadeClassifier("haarcascade_frontalface_alt.xml");
-            var face = new CascadeClassifier("lbpcascade_animeface.xml");
+            // var face = new CascadeClassifier("lbpcascade_animeface.xml");
 
+            var face = new CascadeClassifier("xml.xml");
 
             //加载要识别的图片
             //var img = new Image<Bgr, byte>("0.png");
@@ -48,7 +49,7 @@ namespace TestOpenCV
             var facesDetected = face.DetectMultiScale(Grayimg, 1.1, 10, new Size(50, 50));
 
             //循环把人脸部分切出来并保存
-           // CutandSave(facesDetected);
+            // CutandSave(facesDetected);
             ShowCut(facesDetected);
             CutandSave(facesDetected);
             MessageBox.Show($"{facesDetected.Count()}个");
@@ -75,7 +76,7 @@ namespace TestOpenCV
                 g.Dispose();
                 generatorPictureBox(count, bmpOut);
                 //bmpOut.Save($"{count}.png", System.Drawing.Imaging.ImageFormat.Png);
-               // bmpOut.Dispose();
+                // bmpOut.Dispose();
             }
             b.Dispose();
         }
@@ -112,7 +113,7 @@ namespace TestOpenCV
                 }
                 catch
                 {
-                    MessageBox.Show("未能加载图片,可能时不正确的格式", "错误的预期", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("未能加载图片,可能是不正确的格式", "错误的预期", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
                 pictureBox2.Image = image;
@@ -130,11 +131,11 @@ namespace TestOpenCV
         {
             var g = Graphics.FromImage(image);
             var pen = new Pen(Color.Red);
-            g.DrawRectangle(pen, x,y,width,height);
+            g.DrawRectangle(pen, x, y, width, height);
             return image;
         }
 
-        public void generatorPictureBox(int count,Image bmpOut)
+        public void generatorPictureBox(int count, Image bmpOut)
         {
 
             pict[count - 1] = new System.Windows.Forms.PictureBox
@@ -151,33 +152,52 @@ namespace TestOpenCV
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Test(img,Grayimg);
+            Test(img, Grayimg);
         }
 
-        public class GrayImage
+        public class ImageTouch
         {
-            public GrayImage ()
+            public List<string> ImagePath
             {
+                set; get;
+            }
+            public ImageTouch()
+            {
+
             }
             /// <summary>
             /// 批量灰度化
             /// </summary>
-            public void ImagesToGray(List<string> path)
+            public void ImagesToGray()
             {
-                for (int i = 0; i < path.Count; i++)
+                for (int i = 0; i < ImagePath.Count; i++)
                 {
-                    var img = new Image<Bgr, byte>(path[i]);
+                    var img = new Image<Bgr, byte>(ImagePath[i]);
                     var Grayimg = new Image<Gray, byte>(img.ToBitmap());
                     CvInvoke.CvtColor(img, Grayimg, ColorConversion.Bgr2Gray);
-                    Grayimg.Save(path[i]);
+                    Grayimg.Save(ImagePath[i]);
                     Grayimg.Dispose();
+                }
+            }
+
+            /// <summary>
+            /// 缩放图片
+            /// </summary>
+            public void Shrink()
+            {
+                for (int i = 0; i < ImagePath.Count; i++)
+                {
+                    Image img = Image.FromFile(ImagePath[i]);
+                    Bitmap b = new Bitmap(img, 50, 50);
+                    b.Save("F:\\exa2\\neg2\\"+i.ToString()+".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+                    b.Dispose();
                 }
             }
         }
 
         private void btn_ToGray_Click(object sender, EventArgs e)
         {
-            GrayImage gi = new GrayImage();
+            ImageTouch it = new ImageTouch();
             ///Dictionary<string, Image<Bgr, byte>> BgrImageDic = new Dictionary<string, Image<Bgr, byte>>();
             List<string> imgpaths = new List<string>();
             string path = FolderPath();
@@ -188,7 +208,8 @@ namespace TestOpenCV
                 //img = new Image<Bgr, byte>(imgpath);
                 imgpaths.Add(imgpath);
             }
-            gi.ImagesToGray(imgpaths);
+            it.ImagePath = imgpaths;
+            it.ImagesToGray();
             MessageBox.Show("转化完成");
         }
 
@@ -202,7 +223,7 @@ namespace TestOpenCV
             string Path = "";
             FolderBrowserDialog dialog = new FolderBrowserDialog
             {
-             //  Description = hint
+                //  Description = hint
             };
             if (dialog.ShowDialog() == DialogResult.OK)
             {
@@ -214,6 +235,24 @@ namespace TestOpenCV
                 Path = dialog.SelectedPath;
             }
             return Path;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ImageTouch it = new ImageTouch();
+            ///Dictionary<string, Image<Bgr, byte>> BgrImageDic = new Dictionary<string, Image<Bgr, byte>>();
+            List<string> imgpaths = new List<string>();
+            string path = FolderPath();
+            var files = Directory.GetFiles(path, "*.jpg");
+            for (int i = 0; i < files.Count(); i++)
+            {
+                var imgpath = files[i];
+                //img = new Image<Bgr, byte>(imgpath);
+                imgpaths.Add(imgpath);
+            }
+            it.ImagePath = imgpaths;
+            it.Shrink();
+            MessageBox.Show("转化完成");
         }
     }
 }
